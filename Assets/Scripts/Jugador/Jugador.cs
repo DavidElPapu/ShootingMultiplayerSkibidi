@@ -3,6 +3,7 @@ using Mirror;
 using UnityEngine.InputSystem;
 using TMPro;
 using Newtonsoft.Json;
+using Mirror.BouncyCastle.Utilities.IO;
 
 public class Jugador : NetworkBehaviour
 {
@@ -32,9 +33,12 @@ public class Jugador : NetworkBehaviour
     [Header("Weapons")]
     public Transform transformCannon;
 
+    [SyncVar(hook =nameof(OnKillChanged))]
+    private int kills = 0;
+
     [Header("HP"), SyncVar(hook = nameof(HealthChanged))]
     private int hp = 5;
-    private int maxHp;
+    private int maxHp = 10;
     public Transform healthBar;
     [SyncVar(hook = nameof(AliveHasChanged))]
     private bool isAlive = true;
@@ -51,6 +55,9 @@ public class Jugador : NetworkBehaviour
     public GameObject[] hatsGameObjects = new GameObject[5];
     [SyncVar(hook = nameof(HatChanged))]
     private int hatIndex =10;
+
+    [Header("Team"), SyncVar(hook = nameof(OnChangeTeam))]
+    private Teams myTeam = Teams.None;
 
 
     #endregion
@@ -101,14 +108,20 @@ public class Jugador : NetworkBehaviour
     {
         if (Physics.Raycast(origin,direction, out RaycastHit hit, 100f))
         {
-            if (hit.collider.gameObject.TryGetComponent<Jugador>(out Jugador hitPlayer)==true)
+            if (hit.collider.gameObject.TryGetComponent<Jugador>(out Jugador hitPlayer) == true) 
             {
-                Debug.Log("hice poopoo a: " + hitPlayer.gameObject.name);
-
-                hitPlayer.TakeDamage(1);
-
+                if (hitPlayer.TakeDamage(1, myTeam)) 
+                {
+                    Debug.Log(name + "se papeo a: " + hitPlayer.name);
+                    kills++;
+                }
             }
         }
+    }
+
+    private void OnKillChanged(int oldKills, int newKills)
+    {
+        Debug.Log("ETC...");
     }
     #endregion
 
@@ -118,18 +131,16 @@ public class Jugador : NetworkBehaviour
         healthBar.localScale = new Vector3(healthBar.localScale.x, (float)newHealth / maxHp, healthBar.localScale.z);
     }
     [Server]
-    public void TakeDamage(int amount)
+    public bool TakeDamage(int amount, Teams elTeamo)
     {
-        if (hp<=0)
-        {
-            hp = 0;
-            return;
-        }
+        if (hp <= 0 || elTeamo == myTeam) { hp = 0;return false; }
         hp -= amount;
-        if (hp<=0)
+        if (hp <= 0) 
         {
             KillPlayer();
+            return true;
         }
+        return false;
     }
 
     [Server]
@@ -232,7 +243,14 @@ public class Jugador : NetworkBehaviour
         healthBar.gameObject.SetActive(false);
     }
     #endregion
+    #region Mirror
+    public override void OnStartServer()
+    {
+        base.OnStartServer();
+        CommandSetTeam();
+    }
 
+    #endregion
     [Command]
     private void CommandChangeName(string myName)
     {
@@ -263,5 +281,21 @@ public class Jugador : NetworkBehaviour
         GameObject newHat = Instantiate(hatsGameObjects[newHatIndex], hatLocationTransform);
         if (!isLocalPlayer) return;
         newHat.SetActive(false);
+    }
+
+    [Server]
+    private void CommandSetTeam()
+    {
+        myTeam = TeamManager.singleton.GetBalancedTeam();
+        TeamManager.singleton.RegisterPlayer(this, myTeam);
+    }
+
+    private void OnChangeTeam(Teams oldTeam, Teams newTeam)
+    {
+        SetLook(newTeam);
+    }
+    private void SetLook(Teams elTeam)
+    {
+        Debug.Log("" + "Soy " + elTeam.ToString() + " gurl");
     }
 }

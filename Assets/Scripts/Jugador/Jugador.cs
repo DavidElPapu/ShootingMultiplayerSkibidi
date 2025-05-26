@@ -34,7 +34,7 @@ public class Jugador : NetworkBehaviour
     public Transform transformCannon;
 
     [SyncVar(hook =nameof(OnKillChanged))]
-    private int kills = 0;
+    public int kills = 0;
 
     [Header("HP"), SyncVar(hook = nameof(HealthChanged))]
     private int hp = 5;
@@ -230,6 +230,7 @@ public class Jugador : NetworkBehaviour
         CommandChangeName(_usernamePanel.PideUsuario());
         CommandChangeHat(_usernamePanel.PideSombrero());
         _usernamePanel.gameObject.SetActive(false);
+        CommandRegisterPlayer();
 
     }
     public override void OnStartAuthority()
@@ -297,5 +298,11 @@ public class Jugador : NetworkBehaviour
     private void SetLook(Teams elTeam)
     {
         Debug.Log("" + "Soy " + elTeam.ToString() + " gurl");
+    }
+
+    [Command]
+    private void CommandRegisterPlayer()
+    {
+        ScoreManager.singleton.RegisterPlayer(this);
     }
 }

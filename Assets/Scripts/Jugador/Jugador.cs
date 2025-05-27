@@ -4,6 +4,9 @@ using UnityEngine.InputSystem;
 using TMPro;
 using Newtonsoft.Json;
 using Mirror.BouncyCastle.Utilities.IO;
+using NUnit.Framework;
+using System.Collections.Generic;
+using UnityEngine.Video;
 
 public class Jugador : NetworkBehaviour
 {
@@ -58,6 +61,9 @@ public class Jugador : NetworkBehaviour
 
     [Header("Team"), SyncVar(hook = nameof(OnChangeTeam))]
     private Teams myTeam = Teams.None;
+
+    [Header("UI")]
+    public GameObject uiPanel;
 
 
     #endregion
@@ -216,6 +222,38 @@ public class Jugador : NetworkBehaviour
         
     }
 
+    public void ShowKills(InputAction.CallbackContext context)
+    {
+        if (!isLocalPlayer) return;
+        if (context.started)
+        {
+            Debug.Log("Started");
+            uiPanel.SetActive(true);
+            CommandGetKills();
+        }
+        else if (context.canceled) 
+        {
+            uiPanel.SetActive(false);
+            Debug.Log("Canceled");
+        }
+    }
+    [Command]
+    private void CommandGetKills()
+    {
+        string content = "";
+        var info = ScoreManager.singleton.GetSortedScore();
+        foreach (var item in info)
+        {
+            content = content + "\u2022" + item.name + " - " + item.kills.ToString() + "<br>";
+        }
+        TargetShowKills(content);
+    }
+    [TargetRpc]
+    private void  TargetShowKills(string infoClear)
+    {
+        uiPanel.GetComponent<UIManager>().ShowKills(infoClear);
+    }
+
     public void SetLookDirection(InputAction.CallbackContext context)
     {
         //_camInput = context.ReadValue<Vector2>();
@@ -231,6 +269,7 @@ public class Jugador : NetworkBehaviour
         CommandChangeHat(_usernamePanel.PideSombrero());
         _usernamePanel.gameObject.SetActive(false);
         CommandRegisterPlayer();
+        uiPanel = FindAnyObjectByType<UIManager>(FindObjectsInactive.Include).gameObject;
 
     }
     public override void OnStartAuthority()

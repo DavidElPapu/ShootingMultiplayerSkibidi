@@ -1339,6 +1339,7 @@ MonoBehaviour:
     m_SingletonActionBindings: []
     m_Flags: 0
   transformCannon: {fileID: 2517341437829350333}
+  kills: 0
   healthBar: {fileID: 1896096420337358917}
   respawnTime: 5
   nameTagObject: {fileID: 1711499302029875779}
@@ -1349,6 +1350,7 @@ MonoBehaviour:
   - {fileID: 8848403581960297907, guid: eb2de5353f869fb4598e7c33cb5a0a44, type: 3}
   - {fileID: 8848403581960297907, guid: a8493770c31895a4db92d4870ee82b81, type: 3}
   - {fileID: 8848403581960297907, guid: b946e23edafc0ce4788fa5a952094778, type: 3}
+  uiPanel: {fileID: 0}
 --- !u!114 &4878399599982051062
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1503,6 +1505,22 @@ MonoBehaviour:
       m_Calls: []
     m_ActionId: 9caa3d8a-6b2f-4e8e-8bad-6ede561bd9be
     m_ActionName: UI/TrackedDeviceOrientation
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 8621862827238814751}
+        m_TargetAssemblyTypeName: Jugador, Assembly-CSharp
+        m_MethodName: ShowKills
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 495f851d-bfa6-46c6-8b78-0251fb976e83
+    m_ActionName: 'Player/Tab[/Keyboard/tab]'
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Player

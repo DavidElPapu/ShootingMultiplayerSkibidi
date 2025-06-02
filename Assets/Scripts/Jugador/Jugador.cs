@@ -59,11 +59,16 @@ public class Jugador : NetworkBehaviour
     [SyncVar(hook = nameof(HatChanged))]
     private int hatIndex =10;
 
-    [Header("Team"), SyncVar(hook = nameof(OnChangeTeam))]
+    [Header("Team")]
+    [SyncVar(hook = nameof(OnChangeTeam))]
     private Teams myTeam = Teams.None;
 
     [Header("UI")]
     public GameObject uiPanel;
+    public PlayerHUD playerHUD;
+
+    [Header("Body")]
+    public GameObject[] noShowObjects = new GameObject[3];
 
 
     #endregion
@@ -135,6 +140,11 @@ public class Jugador : NetworkBehaviour
     private void HealthChanged(int oldHealth , int newHealth)
     {
         healthBar.localScale = new Vector3(healthBar.localScale.x, (float)newHealth / maxHp, healthBar.localScale.z);
+        if (isLocalPlayer)
+        {
+            float foo = (float)newHealth / (float)maxHp;
+            playerHUD.SetHP(foo);
+        }
     }
     [Server]
     public bool TakeDamage(int amount, Teams elTeamo)
@@ -163,11 +173,9 @@ public class Jugador : NetworkBehaviour
             transformCam.gameObject.SetActive(false);
             gameObject.GetComponent<PlayerInput>().enabled = false;
             healthBar.gameObject.SetActive(false);
-            if (!isLocalPlayer)
-            {
-                return;
-            }
+            if (!isLocalPlayer) return;
             Invoke("CommandRespawn", respawnTime);
+            playerHUD.gameObject.SetActive(false);
         }
         else
         {
@@ -180,7 +188,7 @@ public class Jugador : NetworkBehaviour
             }
             gameObject.GetComponent<PlayerInput>().enabled = true;
             transformCam.gameObject.SetActive(true);
-
+            playerHUD.gameObject.SetActive(false);
         }
         
     }
@@ -270,6 +278,8 @@ public class Jugador : NetworkBehaviour
         _usernamePanel.gameObject.SetActive(false);
         CommandRegisterPlayer();
         uiPanel = FindAnyObjectByType<UIManager>(FindObjectsInactive.Include).gameObject;
+        playerHUD = FindFirstObjectByType<PlayerHUD>(FindObjectsInactive.Include);
+        playerHUD.gameObject.SetActive(true);
 
     }
     public override void OnStartAuthority()
@@ -281,6 +291,11 @@ public class Jugador : NetworkBehaviour
         transformCam.gameObject.SetActive(true);
         nameTagObject.gameObject.SetActive(false);
         healthBar.gameObject.SetActive(false);
+        //if (!isLocalPlayer) return;
+        foreach (var part in noShowObjects)
+        {
+            part.SetActive(false);
+        }
     }
     #endregion
     #region Mirror
@@ -336,6 +351,13 @@ public class Jugador : NetworkBehaviour
     }
     private void SetLook(Teams elTeam)
     {
+        var mat = noShowObjects[0].GetComponent<SkinnedMeshRenderer>().material;
+        mat.SetFloat("_Toggle", elTeam == Teams.Alpha ? 0 : 1);
+
+        if (!isLocalPlayer) return;
+        var miMat = transformCam.GetChild(0).GetComponent<MeshRenderer>().materials[0]; 
+        miMat.SetFloat("_Toggle", elTeam == Teams.Alpha ? 0 : 1);
+
         Debug.Log("" + "Soy " + elTeam.ToString() + " gurl");
     }
 

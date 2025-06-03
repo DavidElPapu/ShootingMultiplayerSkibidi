@@ -67,6 +67,9 @@ public class Jugador : NetworkBehaviour
     public GameObject uiPanel;
     public PlayerHUD playerHUD;
 
+    [Header("Animation")]
+    public Animator animator;
+
     [Header("Body")]
     public GameObject[] noShowObjects = new GameObject[3];
 
@@ -99,7 +102,7 @@ public class Jugador : NetworkBehaviour
         {
             _rb.AddForce(Vector3.down * gravityNormal, ForceMode.Acceleration);
         }
-
+        animator.SetFloat("Velocity", horizontalVelocity.magnitude);
     }
     void Update()
     {
@@ -145,11 +148,13 @@ public class Jugador : NetworkBehaviour
             float foo = (float)newHealth / (float)maxHp;
             playerHUD.SetHP(foo);
         }
+        if (newHealth < oldHealth)
+            animator.SetTrigger("Hit");
     }
     [Server]
     public bool TakeDamage(int amount, Teams elTeamo)
     {
-        if (hp <= 0 || elTeamo == myTeam) { hp = 0;return false; }
+        if (hp <= 0 || elTeamo == myTeam) { return false; }
         hp -= amount;
         if (hp <= 0) 
         {
@@ -167,15 +172,16 @@ public class Jugador : NetworkBehaviour
 
     private void AliveHasChanged(bool oldBool, bool newBool)
     {
-        if (newBool==false)
+        if (newBool == false) 
         {
-            transform.localScale = new Vector3(1, 0.3f, 1);
+            transform.localScale = new Vector3(10f, 10f, 10f);
             transformCam.gameObject.SetActive(false);
             gameObject.GetComponent<PlayerInput>().enabled = false;
             healthBar.gameObject.SetActive(false);
             if (!isLocalPlayer) return;
             Invoke("CommandRespawn", respawnTime);
             playerHUD.gameObject.SetActive(false);
+            animator.SetBool("Death", true);
         }
         else
         {
@@ -189,6 +195,7 @@ public class Jugador : NetworkBehaviour
             gameObject.GetComponent<PlayerInput>().enabled = true;
             transformCam.gameObject.SetActive(true);
             playerHUD.gameObject.SetActive(false);
+            animator.SetBool("Death", false);
         }
         
     }

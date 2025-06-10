@@ -151,6 +151,13 @@ public class Jugador : NetworkBehaviour
         if (newHealth < oldHealth)
             animator.SetTrigger("Hit");
     }
+
+    [Server]
+    public void IncreaseHealth(int amount)
+    {
+        hp = (hp + amount) > maxHp ? maxHp : hp + amount;
+    }
+
     [Server]
     public bool TakeDamage(int amount, Teams elTeamo)
     {

@@ -1141,10 +1141,10 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0
   spawnTime: 5
-  myType: 0
+  myType: 1
   powerUps:
   - {fileID: 8131122863937041676, guid: bd0634515a3a37c4290e6b90c205dd2d, type: 3}
-  - {fileID: 0}
+  - {fileID: 3798555531989453658, guid: 37b8b8c6dbc13034fbf82ab7efcdcd81, type: 3}
 --- !u!114 &246132212
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3625,6 +3625,7 @@ MonoBehaviour:
   - {fileID: 8848403581960297907, guid: 27039caa5825b9c49983267fbafa94c7, type: 3}
   - {fileID: 8848403581960297907, guid: eb2de5353f869fb4598e7c33cb5a0a44, type: 3}
   - {fileID: 8131122863937041676, guid: bd0634515a3a37c4290e6b90c205dd2d, type: 3}
+  - {fileID: 3798555531989453658, guid: 37b8b8c6dbc13034fbf82ab7efcdcd81, type: 3}
   exceptionsDisconnect: 1
   snapshotSettings:
     bufferTimeMultiplier: 2

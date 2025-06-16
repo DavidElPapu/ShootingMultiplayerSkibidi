@@ -33,13 +33,13 @@ public class PowerUpSpawner : NetworkBehaviour
     private void CmdSpawn()
     {
         spawned = Instantiate(powerUps[(int)myType], transform.position, Quaternion.identity);
-        spawned.GetComponent<Health>().Initialize(this);
+        spawned.GetComponent<APickUp>().Initialize(this);
         NetworkServer.Spawn(spawned);
     }
 
     public IEnumerator CollectPowerUp()
     {
-        var foo = spawned.GetComponent<Health>();
+        var foo = spawned.GetComponent<APickUp>();
         foo.isActive = false;
 
         yield return new WaitForSeconds(spawnTime);

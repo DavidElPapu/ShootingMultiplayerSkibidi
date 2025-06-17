@@ -10,6 +10,7 @@ public class WeaponPU : APickUp
     public override void TakeEffect(Jugador player)
     {
         base.TakeEffect(player);
-        player.currentWeapon = weaponType.ToData();
+        player.currentWeapon = weaponType.ToData().data;
+        player.currentProjectile = weaponType.ToData().projectile;
     }
 }

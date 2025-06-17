@@ -12,8 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a0577e9b678bbe448c0fa84bf734970, type: 3}
   m_Name: Cannon
   m_EditorClassIdentifier: 
-  usesAmmo: 0
-  ammo: 0
+  usesAmmo: 1
+  ammo: 10
   index: 1
   hitScan: 0
   damage: 1
+  projectile: {fileID: 3654678047259687260, guid: 0dc20901d6b4e174cbac30db1a0a44b4, type: 3}
